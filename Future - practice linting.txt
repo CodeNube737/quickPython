@@ -1,0 +1,5 @@
+https://www.pylint.org/
+
+linting is an error checking/bug finding tool for computer coding languages.
+ - see above link as an example
+ - also, u can potentially develop your own linters over time?
