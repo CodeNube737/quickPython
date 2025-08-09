@@ -1,6 +1,6 @@
-#Purpose
+# Purpose
 
-##Open a 10x10 cell spreadsheet as a gui run with python, in which:
+## Open a 10x10 cell spreadsheet as a gui run with python, in which:
 
 &nbsp;- rows and columns can be added as a right-click option
 
