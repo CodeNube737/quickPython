@@ -1,18 +1,18 @@
-#myAlarm.py
+# myAlarm.py
 # run with pythonw, for best usage
-# allows u to set your own alarm, using your own .mp3
-# should run a separate gui, independant of the cmd prompt
-# also should be low computer usage
+# allows you to set your own alarm, using your own .mp3
+# runs a separate GUI, independent of the cmd prompt
+# low computer usage
 # 'Set alarm' creates alarms if date/time is formatted right
 # 'Clear alarm' cancels all active alarms
-# Close the program by closing the gui
+# Close the program by closing the GUI
 #_________________________________________________________
 
 import time
 import datetime
-import pygame
+import winsound
 import tkinter as tk
-import tkinter.messagebox  # Explicitly import messagebox
+import tkinter.messagebox
 from threading import Thread
 
 class AlarmApp:
@@ -39,11 +39,8 @@ class AlarmApp:
 
     def show_alert(self):
         """Plays sound and then displays the visual alarm message."""
-        pygame.mixer.init()
-        pygame.mixer.music.load("Fanfare.mp3")  # Ensure the file is in the same directory
-        pygame.mixer.music.play()  # Start sound BEFORE showing message
-
-        tkinter.messagebox.showinfo("Alarm!", "Time's up!")  # Message box appears after sound starts
+        winsound.PlaySound("Fanfare.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
+        tkinter.messagebox.showinfo("Alarm!", "Time's up!")
 
     def check_alarm(self, alarm_time):
         """Checks system time and triggers the alarm."""
@@ -63,17 +60,17 @@ class AlarmApp:
         self.alarm_active = True
         self.cancel_button.config(state=tk.NORMAL)
 
-        Thread(target=self.check_alarm, args=(alarm_time,)).start()
+        Thread(target=self.check_alarm, args=(alarm_time,), daemon=True).start()
         tk.Label(self.root, text=f"Alarm set for {alarm_time}").pack()
 
     def cancel_alarm(self):
         """Manually cancels the alarm before it goes off."""
         self.alarm_active = False
-        pygame.mixer.music.stop()  # Stop alarm sound if playing
+        winsound.PlaySound(None, winsound.SND_PURGE)  # Stop playback
         self.cancel_button.config(state=tk.DISABLED)
         tkinter.messagebox.showinfo("Alarm Cancelled", "Alarm has been stopped.")
 
-# Run GUI application without blocking terminal
+# Run GUI application
 if __name__ == "__main__":
     root = tk.Tk()
     app = AlarmApp(root)
