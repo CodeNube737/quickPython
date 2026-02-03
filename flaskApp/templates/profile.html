@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Profile</title>
+</head>
+<body>
+
+    <h1>Your Profile</h1>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        <label>First Name:</label><br>
+        <input type="text" name="first_name" value="{{ profile.first_name if profile else '' }}"><br><br>
+
+        <label>Last Name:</label><br>
+        <input type="text" name="last_name" value="{{ profile.last_name if profile else '' }}"><br><br>
+
+        <label>Student ID:</label><br>
+        <input type="text" name="student_id" value="{{ profile.student_id if profile else '' }}"><br><br>
+
+        <button type="submit">Save</button>
+    </form>
+
+</body>
+</html>
