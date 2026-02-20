@@ -1,0 +1,3 @@
+# Simple alarm interface
+- runs with python 3 (3.13.1)
+- just dbl-click the windows-python file (.pyw)
