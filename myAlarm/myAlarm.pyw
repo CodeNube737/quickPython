@@ -57,11 +57,35 @@ class AlarmApp:
         alarm_hour = self.time_entry.get()
         alarm_time = f"{alarm_date} {alarm_hour}"
 
+        # Parse alarm time
+        try:
+            alarm_dt = datetime.datetime.strptime(alarm_time, "%Y-%m-%d %H:%M")
+        except ValueError:
+            print("Invalid date/time format.")
+            tk.Label(self.root, text="Invalid date/time format.").pack()
+            return
+
+        now = datetime.datetime.now()
+        delta = alarm_dt - now
+        if delta.total_seconds() < 0:
+            print("Alarm time is in the past.")
+            tk.Label(self.root, text="Alarm time is in the past.").pack()
+            return
+
+        # Format time in am/pm
+        alarm_ampm = alarm_dt.strftime("%I:%M %p")
+        # Format time difference as xxhrs, xxmins
+        hours, remainder = divmod(int(delta.total_seconds()), 3600)
+        minutes = remainder // 60
+        time_diff = f"{hours}hrs, {minutes}mins"
+
+        print(f"Alarm is set for {alarm_ampm}, which is in {time_diff} from now.")
+        tk.Label(self.root, text=f"Alarm set for {alarm_ampm} (in {time_diff})").pack()
+
         self.alarm_active = True
         self.cancel_button.config(state=tk.NORMAL)
 
         Thread(target=self.check_alarm, args=(alarm_time,), daemon=True).start()
-        tk.Label(self.root, text=f"Alarm set for {alarm_time}").pack()
 
     def cancel_alarm(self):
         """Manually cancels the alarm before it goes off."""
