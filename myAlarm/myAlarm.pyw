@@ -35,12 +35,30 @@ class AlarmApp:
         self.cancel_button = tk.Button(root, text="Cancel Alarm", command=self.cancel_alarm, state=tk.DISABLED)
         self.cancel_button.pack()
 
+        # Volume slider
+        tk.Label(root, text="Volume:").pack()
+        self.volume_slider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL)
+        self.volume_slider.set(100)
+        self.volume_slider.pack()
+
         self.alarm_active = False
 
     def show_alert(self):
-        """Plays sound and then displays the visual alarm message."""
+        """Plays sound at selected volume and then displays the visual alarm message."""
+        self.set_volume(self.volume_slider.get())
         winsound.PlaySound("Fanfare.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
         tkinter.messagebox.showinfo("Alarm!", "Time's up!")
+
+    def set_volume(self, volume):
+        """Sets system volume (Windows only)."""
+        try:
+            import ctypes
+            # volume: 0-100
+            new_volume = int(volume * 65535 / 100)
+            # Set master volume (Windows)
+            ctypes.windll.winmm.waveOutSetVolume(0, new_volume | (new_volume << 16))
+        except Exception as e:
+            print(f"Failed to set volume: {e}")
 
     def check_alarm(self, alarm_time):
         """Checks system time and triggers the alarm."""
