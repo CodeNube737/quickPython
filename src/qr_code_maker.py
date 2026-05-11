@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import qrcode
@@ -82,7 +83,7 @@ def main(argv: list[str] | None = None) -> int:
             border=args.border,
         )
     except (ValueError, OSError) as exc:
-        print(f"Error: {exc}", file=__import__("sys").stderr)
+        print(f"Error: {exc}", file=sys.stderr)
         return 1
 
     print(f"QR code saved to {saved_path}")
