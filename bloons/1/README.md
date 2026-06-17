@@ -1,4 +1,4 @@
-### My notes:
+# My notes:
 
 * I played and enjoyed this recreation of the classic Bloons game
 * I made some additions as per my standard way of running a python file. 
@@ -40,11 +40,9 @@
 
 &#x09;`python main.py`
 
+---
 
-
-\---
-
-### Original notes from developer (caroline-swanton) in repo: 
+# Original notes from developer (caroline-swanton) in repo: 
 
 Title: Monkey Bloons Tower Defense
 
