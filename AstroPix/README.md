@@ -14,6 +14,8 @@ This script downloads NASA's Astronomy Picture of the Day (APOD) and sets it as 
 - Packages: `requests`, `beautifulsoup4`
 - Windows 11
 
+	`pip install -r requirements.txt`
+
 ## Setup
 1. Clone this repository.
 2. Create and activate a Python virtual environment (recommended):
