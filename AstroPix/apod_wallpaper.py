@@ -26,9 +26,10 @@ import requests
 from bs4 import BeautifulSoup
 import ctypes
 import shutil
+from urllib.parse import urljoin
 
 # Constants
-APOD_URL = "https://apod.nasa.gov/apod/astropix.html"
+APOD_URL = "https://science.nasa.gov/apod"
 DOWNLOADS_DIR = os.path.expanduser(r"C:/Users/Dwash/Downloads")
 
 def prompt_close_terminal():
@@ -44,47 +45,44 @@ def get_apod_image_url():
     response = requests.get(APOD_URL)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
-    # Try to find image inside <a> tag first (common for APOD)
-    a_tag = soup.find("a", href=re.compile(r"image/.*\\.(jpg|jpeg|png|gif)$", re.IGNORECASE))
-    if a_tag and a_tag.find("img"):
-        img_src = a_tag["href"]
-        if not img_src.startswith("http"):
-            img_src = "https://apod.nasa.gov/apod/" + img_src
-        # Find explanation (usually in <p> tags near the image)
-        explanation = None
-        # Try to find the <p> tag after the image's parent <center> tag
-        center_tag = a_tag.find_parent("center")
-        if center_tag:
-            # Explanation is often the next <p> after <center>
-            next_p = center_tag.find_next_sibling("p")
-            if next_p:
-                explanation = next_p.get_text(strip=True)
-        # Fallback: find all <p> tags and pick the one with 'Explanation:'
-        if not explanation:
-            for p in soup.find_all("p"):
-                if "Explanation:" in p.get_text():
-                    explanation = p.get_text(strip=True)
-                    break
-        return {"img_url": img_src, "explanation": explanation}
-    # Fallback: find first <img> tag
-    img_tag = soup.find("img")
-    if img_tag and "src" in img_tag.attrs:
-        img_src = img_tag["src"]
-        if not img_src.startswith("http"):
-            img_src = "https://apod.nasa.gov/apod/" + img_src
-        # Try to find explanation as above
-        explanation = None
-        center_tag = img_tag.find_parent("center")
-        if center_tag:
-            next_p = center_tag.find_next_sibling("p")
-            if next_p:
-                explanation = next_p.get_text(strip=True)
-        if not explanation:
-            for p in soup.find_all("p"):
-                if "Explanation:" in p.get_text():
-                    explanation = p.get_text(strip=True)
-                    break
-        return {"img_url": img_src, "explanation": explanation}
+    explanation = next(
+        (
+            p.get_text(strip=True)
+            for p in soup.find_all("p")
+            if "Explanation:" in p.get_text()
+        ),
+        None,
+    )
+
+    # The current NASA APOD page links its featured image through an APOD article.
+    apod_link = next(
+        (
+            link
+            for link in soup.find_all("a", href=re.compile(r"/image-article/apod-"))
+            if link.find("img", src=True)
+        ),
+        None,
+    )
+    if apod_link:
+        img_tag = apod_link.find("img")
+        img_src = img_tag.get("src") if img_tag else None
+        if isinstance(img_src, str):
+            return {
+                "img_url": urljoin(response.url, img_src),
+                "explanation": explanation,
+            }
+
+    # Support the original APOD page, where the image is linked directly.
+    image_link = soup.find(
+        "a", href=re.compile(r"image/.*\.(jpg|jpeg|png|gif)$", re.IGNORECASE)
+    )
+    image_href = image_link.get("href") if image_link else None
+    if image_link and image_link.find("img") and isinstance(image_href, str):
+        return {
+            "img_url": urljoin(response.url, image_href),
+            "explanation": explanation,
+        }
+
     # Check for video link
     video_tag = soup.find("a", string=re.compile(r"video|youtube|vimeo|facebook", re.IGNORECASE))
     if video_tag and video_tag.has_attr("href"):
